@@ -66,6 +66,8 @@
   "author": "",
   "winkeyWorkFlow": "vite",
   "dependencies": {
+    "@react-three/drei": "^9.112.0",
+    "@react-three/fiber": "^8.17.7",
     "axios": "^0.27.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -74,6 +76,7 @@
     "react-router-dom": "^6.4.1",
     "sass": "^1.55.0",
     "scss": "^0.2.4",
+    "three": "^0.168.0",
     "winkey-init-config-vite": "latest"
   },
   "main": "index.js"
