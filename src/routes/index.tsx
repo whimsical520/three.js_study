@@ -28,5 +28,30 @@ export const subPageRoutes: SubPageRoutesItem[] = [
     title: '3D场景中插入新的几何体',
     path: '/demo04',
     Component: lazy(() => import('~/components/subPages/demo04/index'))
+  },
+  {
+    title: '材质效果',
+    path: '/demo05',
+    Component: lazy(() => import('~/components/subPages/demo05/index'))
+  },
+  {
+    title: 'threejs光源',
+    path: '/demo06',
+    Component: lazy(() => import('~/components/subPages/demo06/index'))
+  },
+  {
+    title: '顶点位置数据解析渲染',
+    path: '/demo07',
+    Component: lazy(() => import('~/components/subPages/demo07/index'))
+  },
+  {
+    title: '顶点颜色数据插值计算',
+    path: '/demo08',
+    Component: lazy(() => import('~/components/subPages/demo08/index'))
+  },
+  {
+    title: '顶点法向量数据光照计算',
+    path: '/demo09',
+    Component: lazy(() => import('~/components/subPages/demo09/index'))
   }
 ]
