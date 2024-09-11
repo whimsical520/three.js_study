@@ -53,5 +53,10 @@ export const subPageRoutes: SubPageRoutesItem[] = [
     title: '顶点法向量数据光照计算',
     path: '/demo09',
     Component: lazy(() => import('~/components/subPages/demo09/index'))
-  }
+  },
+  {
+    title: 'Three.js光照阴影实时计算',
+    path: '/demo10',
+    Component: lazy(() => import('~/components/subPages/demo10/index'))
+  },
 ]
