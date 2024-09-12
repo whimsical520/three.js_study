@@ -22,6 +22,7 @@ const winkeyConfig: WinkeyProjectConfig = {
     imagesPath: 'images',
     revPath: 'assets'
   },
+
   cssModules: true,
   alias: {
     srcRoot: SRC_ROOT

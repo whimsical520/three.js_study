@@ -1,33 +1,40 @@
 import React, { useEffect } from 'react'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import demoImg from './demo.jpg'
 
 const Demo: React.FC = () => {
   const THREE = window.THREE
+
   useEffect(() => {
-    console.log('????')
     /**
      * 创建场景对象Scene
      */
     const scene = new THREE.Scene()
+
+    //矩形平面，细分数默认1，即2个三角形拼接成一个矩形
+    const geometry = new THREE.PlaneGeometry(204, 102)
     /**
-     * 创建网格模型
+     * 遍历uv坐标
      */
-    const geometry = new THREE.BoxGeometry(100, 100, 100) // 创建一个立方体几何对象Geometry
-    const material = new THREE.MeshLambertMaterial({
-      color: 0x0000ff
-    }) //材质对象Material
-    const mesh = new THREE.Mesh(geometry, material) // 网格模型对象Mesh
-    console.log('mesh :', mesh)
-    scene.add(mesh) // 网格模型添加到场景中
+    geometry.faceVertexUvs[0].forEach((elem: any) => {
+      elem.forEach((Vector2: any) => {
+        // 所有的UV坐标全部设置为一个值
+        Vector2.set(0.4, 0.4)
+      })
+    })
+
+    // 辅助坐标系  参数250表示坐标系大小，可以根据场景大小去设置
+    const axisHelper = new THREE.AxisHelper(250)
+    scene.add(axisHelper)
+
     /**
      * 光源设置
      */
     // 点光源
-    const point = new THREE.PointLight(0xffffff)
+    const point = new THREE.AmbientLight(0xffffff)
     point.position.set(400, 200, 300) // 点光源位置
     scene.add(point) // 点光源添加到场景中
-    // 环境光
-    const ambient = new THREE.AmbientLight(0x444444)
-    scene.add(ambient)
+
     /**
      * 相机设置
      */
@@ -39,6 +46,7 @@ const Demo: React.FC = () => {
     const camera = new THREE.OrthographicCamera(-s * k, s * k, s, -s, 1, 1000)
     camera.position.set(200, 300, 200) // 设置相机位置
     camera.lookAt(scene.position) // 设置相机方向（指向的场景对象）
+
     /**
      * 创建渲染器对象
      */
@@ -46,13 +54,17 @@ const Demo: React.FC = () => {
     renderer.setSize(width, height) // 设置渲染区域尺寸
     renderer.setClearColor(0xb9d333, 1) // 设置背景颜色
     document.body.appendChild(renderer.domElement) // body 元素中插入canvas对象
-    // 执行渲染操作 指定场景、相机作为参数
-    renderer.render(scene, camera)
 
-    console.log('renderer:', renderer)
+    function render() {
+      // 执行渲染操作 指定场景、相机作为参数
+      renderer.render(scene, camera)
+    }
+
+    const controls = new OrbitControls(camera, renderer.domElement) // 创建控件对象
+    controls.addEventListener('change', render)
   }, [])
 
-  return <div>第一个three.js文件_WebGL三维场景</div>
+  return <div>Three.js几何体顶点纹理坐标UV</div>
 }
 
 export default Demo

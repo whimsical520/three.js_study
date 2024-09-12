@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 const Demo: React.FC = () => {
   const THREE = window.THREE
@@ -14,7 +14,7 @@ const Demo: React.FC = () => {
      */
     //长方体 参数：长，宽，高
     // const geometry = new THREE.BoxGeometry(100, 100, 100) // 创建一个立方体几何对象Geometry
-    
+
     // 球体 参数：半径60  经纬度细分数40,40
     // const geometry = new THREE.SphereGeometry(60, 40, 40);
 
@@ -52,16 +52,16 @@ const Demo: React.FC = () => {
     const mesh2 = new THREE.Mesh(geometry2, material2)
     mesh2.translateY(120) // 球体网络模型沿Y轴正方向平移120
     scene.add(mesh2)
-    
+
     // 圆柱网格模型
-    const geometry3 = new THREE.CylinderGeometry(50, 50, 100, 25);
+    const geometry3 = new THREE.CylinderGeometry(50, 50, 100, 25)
     const material3 = new THREE.MeshLambertMaterial({
       color: 0xffff00
-    });
-    const mesh3 = new THREE.Mesh(geometry3, material3); //网格模型对象Mesh
+    })
+    const mesh3 = new THREE.Mesh(geometry3, material3) //网格模型对象Mesh
     // mesh3.translateX(120); //球体网格模型沿Y轴正方向平移120
-    mesh3.position.set(120,0,0);//设置mesh3模型对象的xyz坐标为120,0,0
-    scene.add(mesh3); //
+    mesh3.position.set(120, 0, 0) //设置mesh3模型对象的xyz坐标为120,0,0
+    scene.add(mesh3) //
 
     /**
      * 光源设置
@@ -72,11 +72,11 @@ const Demo: React.FC = () => {
     scene.add(point) // 点光源添加到场景中
     // 环境光
     const ambient = new THREE.AmbientLight(0x444444)
-    scene.add(ambient) 
+    scene.add(ambient)
 
     // 辅助坐标系  参数250表示坐标系大小，可以根据场景大小去设置
-    const axisHelper = new THREE.AxisHelper(250);
-    scene.add(axisHelper);
+    const axisHelper = new THREE.AxisHelper(250)
+    scene.add(axisHelper)
 
     /**
      * 相机设置
@@ -94,7 +94,7 @@ const Demo: React.FC = () => {
      */
     const renderer = new THREE.WebGLRenderer()
     renderer.setSize(width, height) // 设置渲染区域尺寸
-    renderer.setClearColor(0xb9d333, 1)// 设置背景颜色
+    renderer.setClearColor(0xb9d333, 1) // 设置背景颜色
     document.body.appendChild(renderer.domElement) // body 元素中插入canvas对象
 
     function render() {
@@ -108,9 +108,7 @@ const Demo: React.FC = () => {
     controls.addEventListener('change', render)
   }, [])
 
-  return (
-    <div>3D场景中插入新的几何体</div>
-  )
+  return <div>3D场景中插入新的几何体</div>
 }
 
 export default Demo
