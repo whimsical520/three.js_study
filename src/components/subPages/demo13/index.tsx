@@ -10,29 +10,67 @@ const Demo: React.FC = () => {
   const THREE = window.THREE
   let camera: any = null
   let scene: any = null
-  let tween: any = null
-  
+  const tween: any = null
+
   const handleClickToRight = () => {
     // // 设置相机位置
     // camera.position.set(1.87, 1.03, 0.4)
     // // 设置相机指向的位置
     // camera.lookAt(scene.position)
 
-    tween = new TWEEN.Tween({ x: camera.position.x, y: camera.position.y, z: camera.position.z })
-    .to({ x: 1.87, y: 1.03, z: 0.4 }, 2000) // 目标位置和过渡时间
-    .easing(TWEEN.Easing.Quadratic.InOut) // 缓动函数
-    .onUpdate(function() {
-        // 更新相机的位置
-        camera.position.set(1.87, 1.03, 0.4);
-    })
-    .start(); // 开始过渡动画
+    // tween = new TWEEN.Tween({ x: camera.position.x, y: camera.position.y, z: camera.position.z })
+    //   .to({ x: 1.87, y: 1.03, z: 0.4 }, 2000) // 目标位置和过渡时间
+    //   .easing(TWEEN.Easing.Quadratic.InOut) // 缓动函数
+    //   .onUpdate(function () {
+    //     console.log('12')
+    //     // 更新相机的位置
+    //     camera.position.set(1.87, 1.03, 0.4)
+    //     camera.lookAt(scene.position)
+    //   })
+    //   .start() // 开始过渡动画
+    let x = -1.87
+    let y = -1.03
+    let z = 0.4
+    const targetX = 0
+    const targetY = 0.1
+    const targetZ = 1
+
+    const animation = () => {
+      if (x < targetX || y < targetY || z < targetZ) {
+        if (x >= targetX) {
+          x = targetX
+        } else {
+          x += 0.01
+        }
+
+        if (y >= targetY) {
+          y = targetY
+        } else {
+          y += 0.01
+        }
+
+        if (z >= targetZ) {
+          z = targetZ
+        } else {
+          z += 0.05
+        }
+
+        requestAnimationFrame(animation)
+        // 设置相机位置
+        camera.position.set(x, y, z)
+        // 设置相机指向的位置
+        camera.lookAt(scene.position)
+      }
+    }
+
+    animation()
   }
 
   const handleClickToLeft = () => {
-     // 设置相机位置
-     camera.position.set(-1.87, -1.03, 0.4)
-     // 设置相机指向的位置
-     camera.lookAt(scene.position)
+    // 设置相机位置
+    camera.position.set(-1.87, -1.03, 0.4)
+    // 设置相机指向的位置
+    camera.lookAt(scene.position)
   }
 
   useEffect(() => {
@@ -89,8 +127,6 @@ const Demo: React.FC = () => {
     // 设置相机指向的位置
     camera.lookAt(scene.position)
 
-
-
     // WebGLRenderer 是 Three.js 中用于将场景渲染到 WebGL 上下文的类。它是 Three.js 中最重要的组件之一，负责将场景中的物体、光源、相机等元素渲染到屏幕上。
 
     // 以下是关于 WebGLRenderer 的一些重要信息：
@@ -105,7 +141,6 @@ const Demo: React.FC = () => {
 
     renderer.setSize(width, height)
     document.body.appendChild(renderer.domElement)
-
 
     // 在 Three.js 中，Clock 是用来跟踪时间的工具类。它可以用来管理和跟踪动画的时间，特别是在制作基于时间的动画效果时非常有用。
     const clock = new THREE.Clock()
@@ -135,13 +170,20 @@ const Demo: React.FC = () => {
     render()
 
     const controls = new OrbitControls(camera, renderer.domElement) // 创建控件对象
-    controls.enablePan = false
+    // controls.enablePan = false
+    controls.addEventListener('change', () => {
+      render()
+      console.log(camera.position)
+    })
   }, [])
 
-  return <div>房子3D
-    <button onClick={handleClickToRight}>向右</button>
-    <button onClick={handleClickToLeft}>向左</button>
-  </div>
+  return (
+    <div>
+      房子3D
+      <button onClick={handleClickToRight}>向右</button>
+      <button onClick={handleClickToLeft}>向左</button>
+    </div>
+  )
 }
 
 export default Demo

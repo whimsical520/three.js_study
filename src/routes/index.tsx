@@ -73,5 +73,15 @@ export const subPageRoutes: SubPageRoutesItem[] = [
     title: '房子3D',
     path: '/demo13',
     Component: lazy(() => import('~/components/subPages/demo13/index'))
+  },
+  {
+    title: '相机过渡',
+    path: '/demo14',
+    Component: lazy(() => import('~/components/subPages/demo14/index'))
+  },
+  {
+    title: '恐龙跳跃小游戏',
+    path: '/demo15',
+    Component: lazy(() => import('~/components/subPages/demo15/index'))
   }
 ]
