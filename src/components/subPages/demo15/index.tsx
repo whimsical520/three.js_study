@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import * as TWEEN from 'tween.js'
-// import THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import img01 from './00125.jpg'
-import bgm from './bgm.m4a'
-import testJPEG from './test.jpeg'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
+import TRexSceneGltf from './models/t-rex/scene.gltf'
+import PterodactylSceneGltf from './models/pterodactyl/scene.gltf'
+import CactusSceneGltf from './models/cactus/scene.gltf'
+import SandJPG from './images/sand.jpg'
+import DesertJPG from './images/desert.jpg'
 
 const TREX_JUMP_SPEED = 20
 
@@ -35,7 +34,6 @@ function randomInt(min: number, max: number) {
 function randomFloat(min: number, max: number) {
   return Math.random() * (max - min) + min
 }
-
 
 const Demo: React.FC = () => {
   let infoElement: any
@@ -81,14 +79,8 @@ const Demo: React.FC = () => {
 
   function gameOver() {
     isGameOver = true
-  
-    infoElement.innerHTML = 'GAME OVER'
-  }
 
-  function respawnPterodactyl() {
-    nextPterodactylResetTime = clock.elapsedTime + PTERODACTYL_SPAWN_INTERVAL
-    pterodactyl.position.x = PTERODACTYL_SPAWN_X
-    pterodactyl.position.y = randomFloat(PTERODACTYL_MIN_Y, PTERODACTYL_MAX_Y)
+    infoElement.innerHTML = 'GAME OVER'
   }
 
   const update = (delta: any) => {
@@ -120,15 +112,15 @@ const Demo: React.FC = () => {
 
     if (clock.elapsedTime > nextCactusSpawnTime) {
       const interval = randomFloat(CACTUS_SPAWN_MIN_INTERVAL, CACTUS_SPAWN_MAX_INTERVAL)
-  
+
       nextCactusSpawnTime = clock.elapsedTime + interval
-  
+
       const numCactus = randomInt(3, 5)
       for (let i = 0; i < numCactus; i++) {
         const clone = cactus.clone()
         clone.position.x = CACTUS_SPAWN_X + i * 0.5
         clone.scale.multiplyScalar(randomFloat(CACTUS_MIN_SCALE, CACTUS_MAX_SCALE))
-  
+
         cactusGroup.add(clone)
       }
     }
@@ -148,35 +140,35 @@ const Demo: React.FC = () => {
       new THREE.Vector3(-1, trex.position.y, 0),
       new THREE.Vector3(1, trex.position.y + 2, 0)
     )
-  
+
     for (const cactus of cactusGroup.children) {
       const cactusAABB = new THREE.Box3()
       cactusAABB.setFromObject(cactus)
-  
+
       if (cactusAABB.intersectsBox(trexAABB)) {
         gameOver()
         return
       }
     }
-  
+
     // Update texture offset to simulate floor moving.
     floor.material.map.offset.add(new THREE.Vector2(delta, 0))
-  
+
     trex.traverse((child: any) => {
       child.castShadow = true
       child.receiveShadow = false
     })
-  
+
     if (skySphere) {
       skySphere.rotation.y += delta * SKYSPHERE_ROTATE_SPEED
     }
-  
+
     if (clock.elapsedTime > nextPterodactylResetTime) {
       respawnPterodactyl()
     } else {
       pterodactyl.position.x += delta * PTERODACTYL_SPEED
     }
-  
+
     score += delta * SCORE_INCREASE_SPEED
     infoElement.innerHTML = Math.floor(score).toString().padStart(5, '0')
   }
@@ -204,32 +196,166 @@ const Demo: React.FC = () => {
     scene.add(light)
   }
 
-  function load3DModels() {
+  const load3DModels = () => {
     const loader = new GLTFLoader()
 
-    loader.load('models/t-rex/scene.gltf', function(gltf) {
-      trex = gltf.scene
-    
-      trex.scale.setScalar(0.5)
-      trex.rotation.y = Math.PI / 2
+    loader.load(
+      TRexSceneGltf,
+      function (gltf) {
+        trex = gltf.scene
 
-      scene.add(trex)
+        trex.scale.setScalar(0.5)
+        trex.rotation.y = Math.PI / 2
 
-      const mixer = new THREE.AnimationMixer(trex)
-      const clip = THREE.AnimationClip.findByName(gltf.animations, 'run')
+        scene.add(trex)
 
-      if (clip) {
-        const action = mixer.clipAction(clip)
-        action.play()
+        const mixer = new THREE.AnimationMixer(trex)
+        const clip = THREE.AnimationClip.findByName(gltf.animations, 'run')
+
+        if (clip) {
+          const action = mixer.clipAction(clip)
+          action.play()
+        }
+
+        mixers.push(mixer)
+      },
+      function (xhr) {
+        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+      },
+      function (error) {
+        console.log('An error happened')
+      }
+    )
+
+    loader.load(PterodactylSceneGltf, function (gltf) {
+      pterodactyl = gltf.scene
+      pterodactyl.rotation.y = Math.PI / 2
+      pterodactyl.scale.multiplyScalar(4)
+
+      respawnPterodactyl()
+
+      scene.add(pterodactyl)
+
+      const mixer = new THREE.AnimationMixer(pterodactyl)
+      const clip = THREE.AnimationClip.findByName(gltf.animations, 'flying')
+      const action = mixer.clipAction(clip)
+      action.play()
+      mixers.push(mixer)
+    })
+
+    loader.load(
+      CactusSceneGltf,
+      function (gltf) {
+        gltf.scene.scale.setScalar(0.05)
+        gltf.scene.position.y = -Math.PI / 2
+
+        cactus = gltf.scene
+      },
+      function (xhr) {
+        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+      },
+      function (error) {
+        console.log('An error happened')
+      }
+    )
+  }
+
+  const createFloor = () => {
+    const geometry = new THREE.PlaneGeometry(1000, 1000, 10, 10)
+    const textureLoader = new THREE.TextureLoader()
+    const texture = textureLoader.load(SandJPG)
+
+    texture.wrapS = THREE.RepeatWrapping
+    texture.wrapT = THREE.RepeatWrapping
+    texture.repeat.set(100, 100)
+
+    const material = new THREE.MeshStandardMaterial({
+      map: texture,
+      color: 0xc4733b
+    })
+
+    floor = new THREE.Mesh(geometry, material)
+    floor.material.side = THREE.DoubleSide
+    floor.rotation.x = -Math.PI / 2
+
+    floor.castShadow = false
+    floor.receiveShadow = true
+
+    scene.add(floor)
+  }
+
+  const createSkySphere = () => {
+    const geometry = new THREE.SphereGeometry(500, 60, 40)
+    geometry.scale(-1, 1, 1)
+
+    const textureLoader = new THREE.TextureLoader()
+    const texture = textureLoader.load(DesertJPG)
+
+    texture.colorSpace = THREE.SRGBColorSpace
+
+    const material = new THREE.MeshBasicMaterial({
+      map: texture
+    })
+    skySphere = new THREE.Mesh(geometry, material)
+
+    scene.add(skySphere)
+  }
+
+  const enableShadow = (renderer: THREE.WebGLRenderer, light: THREE.DirectionalLight) => {
+    renderer.shadowMap.enabled = true
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+    light.castShadow = true
+
+    if (light.shadow) {
+      light.shadow.mapSize.width = 512
+      light.shadow.mapSize.height = 512
+      light.shadow.camera.near = 0.001
+      light.shadow.camera.far = 500
+    }
+  }
+
+  function restartGame() {
+    isGameOver = false
+    score = 0
+
+    respawnPterodactyl()
+
+    cactusGroup.children.length = 0
+  }
+
+  const respawnPterodactyl = () => {
+    nextPterodactylResetTime = clock.elapsedTime + PTERODACTYL_SPAWN_INTERVAL
+    pterodactyl.position.x = PTERODACTYL_SPAWN_X
+    pterodactyl.position.y = randomFloat(PTERODACTYL_MIN_Y, PTERODACTYL_MAX_Y)
+  }
+
+  const handleInput = () => {
+    const callback = () => {
+      if (isGameOver) {
+        restartGame()
+        return
       }
 
-      mixers.push(mixer)
-    },   function (xhr) {
-      console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
-    },
-    function (error) {
-      console.log('An error happened')
-    })
+      jump = true
+    }
+
+    document.addEventListener('keydown', callback, false)
+    renderer.domElement.addEventListener('toustart', callback)
+    renderer.domElement.addEventListener('click', callback)
+  }
+
+  const handleWindowResize = () => {
+    window.addEventListener(
+      'resize',
+      () => {
+        camera.aspect = window.innerWidth / window.innerHeight
+        camera.updateProjectionMatrix()
+
+        renderer.setSize(window.innerWidth, window.innerHeight)
+      },
+      false
+    )
   }
 
   const init = useCallback(() => {
@@ -238,6 +364,12 @@ const Demo: React.FC = () => {
     createRender()
     animate()
     createLighting()
+    load3DModels()
+    createFloor()
+    createSkySphere()
+    enableShadow(renderer, directionalLight)
+    handleInput()
+    handleWindowResize()
   }, [])
 
   useEffect(() => {

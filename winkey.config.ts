@@ -14,7 +14,7 @@ const winkeyConfig: WinkeyProjectConfig = {
   platform: PLATFORM,
   version: VERSION,
   yarn: USE_YARN,
-  assetsInclude: ['**/*.m4a'],
+  assetsInclude: ['**/*.m4a', '**/*.gltf'],
   dest: {
     basePath: `project/${PROJECT_NAME}/${PLATFORM}/`,
     jsPath: 'js',
