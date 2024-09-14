@@ -73,6 +73,7 @@ const Demo: React.FC = () => {
     renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setClearColor(0x7f7f7f)
+    // 模型加载（GLTF加载器）时，可能会遇到模型材质颜色和实际渲染颜色有色差的问题，可以尝试进行如下配置：
     renderer.outputColorSpace = THREE.SRGBColorSpace
     document.body.appendChild(renderer.domElement)
   }
@@ -89,7 +90,7 @@ const Demo: React.FC = () => {
     if (!floor) return
     if (!pterodactyl) return
     if (isGameOver) return
-
+    console.log('mixers:', mixers)
     for (const mixer of mixers) {
       mixer.update(delta)
     }
@@ -177,12 +178,14 @@ const Demo: React.FC = () => {
     requestAnimationFrame(animate)
 
     const delta = clock.getDelta()
+
     update(delta)
 
     renderer.render(scene, camera)
   }
 
   const createLighting = () => {
+    // 加入一个方向光：color 颜色, intensity 强度
     directionalLight = new THREE.DirectionalLight(0xffffff, 1)
     directionalLight.intensity = 2
     directionalLight.position.set(0, 10, 0)
@@ -190,9 +193,15 @@ const Demo: React.FC = () => {
     const targetObject = new THREE.Object3D()
     targetObject.position.set(0, 0, 0)
     scene.add(directionalLight)
+    // DirectionalLight 的 target 属性的意义：
+    // 定向光照射目标：target 属性用于指定平行光照射的目标对象。光线会从 DirectionalLight 的位置指向 target 参数所指定的对象，而不是向所有方向散射。
+    // 影响光照方向：通过设置 target 属性，你可以控制平行光的照射方向。光线将根据光源位置和目标对象的位置而定向。
+    // 用于阴影计算：在渲染带有平行光的场景时，target 属性还可以用于帮助计算阴影。例如，平行光通过设置目标对象来确定光线的方向，从而帮助生成场景中的阴影效果。
+    directionalLight.target = targetObject
 
+    // 在 Three.js 中，AmbientLight 是一种类型的光源，用于模拟场景中的环境光。环境光是一种均匀且无方向的光照，它会均匀地照亮场景中的所有对象，不会产生阴影。
     const light = new THREE.AmbientLight(0x7f7f7f)
-    light.intensity = 1
+    light.intensity = 10
     scene.add(light)
   }
 
