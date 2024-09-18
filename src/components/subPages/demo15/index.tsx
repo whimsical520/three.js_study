@@ -91,6 +91,7 @@ const Demo: React.FC = () => {
     if (!pterodactyl) return
     if (isGameOver) return
     console.log('mixers:', mixers)
+
     for (const mixer of mixers) {
       mixer.update(delta)
     }
@@ -106,6 +107,8 @@ const Demo: React.FC = () => {
 
     if (trex.position.y > 0) {
       vel += GRAVITY * delta
+      console.log('delta:', delta)
+      console.log('vel:', vel)
       trex.position.y += vel * delta
     } else {
       trex.position.y = 0
@@ -137,7 +140,9 @@ const Demo: React.FC = () => {
       cactusGroup.remove(cactusGroup.children[0])
     }
 
+    // THREE.Box3 是 Three.js 中的一个类，用于表示三维空间中的一个立方体边界框（bounding box）。它通常用于计算和表示物体或几何体的边界框，这在进行碰撞检测、包围盒裁剪、视锥体裁剪等方面非常有用。
     const trexAABB = new THREE.Box3(
+      // THREE.Vector3 是 Three.js 中用于表示三维空间中的向量的类。在三维计算中，向量是一个有方向和大小的量，可以用来表示位置、方向、速度等。
       new THREE.Vector3(-1, trex.position.y, 0),
       new THREE.Vector3(1, trex.position.y + 2, 0)
     )

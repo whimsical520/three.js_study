@@ -83,5 +83,10 @@ export const subPageRoutes: SubPageRoutesItem[] = [
     title: '恐龙跳跃小游戏',
     path: '/demo15',
     Component: lazy(() => import('~/components/subPages/demo15/index'))
+  },
+  {
+    title: '自己搞恐龙跳跃小游戏',
+    path: '/demo16',
+    Component: lazy(() => import('~/components/subPages/demo16/index'))
   }
 ]
