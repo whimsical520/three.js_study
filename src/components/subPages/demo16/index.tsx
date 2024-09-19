@@ -33,9 +33,11 @@ const Demo: React.FC = () => {
 
     loader.load(TRexSceneGltf, function (gltf) {
       console.log('gltf:', gltf)
+      const mesh = gltf.scene.children[0] //获取Mesh
+      console.log('mesh:', mesh)
       trex = gltf.scene
       trex.scale.setScalar(0.5)
-      trex.position.y = Math.PI / 2
+      trex.rotation.y = Math.PI / 2
 
       scene.add(trex)
 
@@ -55,14 +57,33 @@ const Demo: React.FC = () => {
 
   const createLighting = useCallback(() => {
     directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+    directionalLight.intensity = 2
+    directionalLight.position.set(0, 10, 0)
 
     scene.add(directionalLight)
+
+    const targetObject = new THREE.Object3D()
+    targetObject.position.set(0, 0, 0)
+
+    directionalLight.target = targetObject
+
+    const light = new THREE.AmbientLight(0x7f7f7f)
+    light.intensity = 10
+
+    scene.add(light)
   }, [])
 
   const update = (delta: number) => {
+    if (!trex) return
+
     for (const mixer of mixers) {
       mixer.update(delta)
     }
+
+    trex.traverse((child: any) => {
+      child.castShadow = true
+      child.receiveShadow = false
+    })
   }
 
   const animate = useCallback(() => {
@@ -75,13 +96,28 @@ const Demo: React.FC = () => {
     renderer.render(scene, camera)
   }, [])
 
+  const enableShadow = useCallback(() => {
+    renderer.shadowMap.enabled = true
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+    directionalLight.castShadow = true
+
+    if (directionalLight.shadow) {
+      directionalLight.shadow.mapSize.width = 512
+      directionalLight.shadow.mapSize.height = 512
+      directionalLight.shadow.camera.near = 0.001
+      directionalLight.shadow.camera.far = 500
+    }
+  }, [])
+
   useEffect(() => {
     createCamera()
     createRender()
     load3DModels()
     animate()
     createLighting()
-  }, [createCamera])
+    enableShadow()
+  }, [createCamera, createRender, load3DModels, animate, createLighting, enableShadow])
 
   return (
     <div>
